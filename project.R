@@ -67,17 +67,37 @@ q3<-function() {
                             with(baltimore2008ByType$"ON-ROAD",  sum(Emissions)),
                             with(baltimore2008ByType$POINT,      sum(Emissions)))
 
-  plot(rep(1999,4),   baltimore1999ByTypeSum, pch=c(1,2,3,4), xlim=c(1999, 2008), ylim=c(0, 2500))
+  plot(  rep(1999,4), baltimore1999ByTypeSum, pch=c(1,2,3,4), xlim=c(1999, 2008), ylim=c(0, 2500))
   points(rep(2002,4), baltimore2002ByTypeSum, pch=c(1,2,3,4))
   points(rep(2005,4), baltimore2005ByTypeSum, pch=c(1,2,3,4))
   points(rep(2008,4), baltimore2008ByTypeSum, pch=c(1,2,3,4))
   
-  segments(rep(1999, 4), baltimore1999ByTypeSum, 
-           rep(2002, 4), baltimore2002ByTypeSum)
-  segments(rep(2002, 4), baltimore2002ByTypeSum, 
-           rep(2005, 4), baltimore2005ByTypeSum)
-  segments(rep(2005, 4), baltimore2005ByTypeSum, 
-           rep(2008, 4), baltimore2008ByTypeSum)
-  View(c(baltimore1999ByTypeSum, baltimore2002ByTypeSum,
-         baltimore2005ByTypeSum, baltimore2008ByTypeSum))
+  segments(rep(1999,4), baltimore1999ByTypeSum, 
+           rep(2002,4), baltimore2002ByTypeSum)
+  segments(rep(2002,4), baltimore2002ByTypeSum, 
+           rep(2005,4), baltimore2005ByTypeSum)
+  segments(rep(2005,4), baltimore2005ByTypeSum, 
+           rep(2008,4), baltimore2008ByTypeSum)
+}
+
+q4<-function() {
+  shortNameContainsCoal<-subset(SCC, grepl("Coal", Short.Name))
+  coal1999<-subset(NEI, (year==1999) & (SCC %in% shortNameContainsCoal$SCC))
+  coal2002<-subset(NEI, (year==2002) & (SCC %in% shortNameContainsCoal$SCC))
+  coal2005<-subset(NEI, (year==2005) & (SCC %in% shortNameContainsCoal$SCC))
+  coal2008<-subset(NEI, (year==2008) & (SCC %in% shortNameContainsCoal$SCC))
+  
+  totalCoalEmissions1999<-sum(coal1999$Emissions)
+  totalCoalEmissions2002<-sum(coal2002$Emissions)
+  totalCoalEmissions2005<-sum(coal2005$Emissions)
+  totalCoalEmissions2008<-sum(coal2008$Emissions)
+  
+  totalCoalEmissions<-c(totalCoalEmissions1999, 
+                        totalCoalEmissions2002, 
+                        totalCoalEmissions2005, 
+                        totalCoalEmissions2008)
+  
+  emissionsYear<-c(1999, 2002, 2005, 2008)
+  
+  plot(emissionsYear, totalCoalEmissions)
 }
