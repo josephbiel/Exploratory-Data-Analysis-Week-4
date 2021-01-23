@@ -14,7 +14,10 @@ q1<-function()
                     totalEmissions2005, 
                     totalEmissions2008)
   emissionsYear<-c(1999, 2002, 2005, 2008)
+  
+  png("q1.png")
   plot(emissionsYear, totalEmissions)
+  dev.off()
 }
 
 q2<-function() {
@@ -31,7 +34,9 @@ q2<-function() {
                              totalEmissionsBaltimore2005, 
                              totalEmissionsBaltimore2008)
   emissionsYear<-c(1999, 2002, 2005, 2008)
+  png("q2.png")
   plot(emissionsYear, totalEmissionsBaltimore)
+  dev.off()
 }
 
 q3<-function() {
@@ -42,7 +47,7 @@ q3<-function() {
                             with(baltimore1999ByType$NONPOINT,   sum(Emissions)),
                             with(baltimore1999ByType$"ON-ROAD",  sum(Emissions)),
                             with(baltimore1999ByType$POINT,      sum(Emissions)))
-
+  
   baltimore2002<-subset(NEI, NEI$year==2002 & NEI$fips=="24510")
   baltimore2002$type<-as.factor(baltimore2002$type)
   baltimore2002ByType<-split(baltimore2002, baltimore2002$type)
@@ -66,18 +71,23 @@ q3<-function() {
                             with(baltimore2008ByType$NONPOINT,   sum(Emissions)),
                             with(baltimore2008ByType$"ON-ROAD",  sum(Emissions)),
                             with(baltimore2008ByType$POINT,      sum(Emissions)))
-
-  plot(  rep(1999,4), baltimore1999ByTypeSum, pch=c(1,2,3,4), xlim=c(1999, 2008), ylim=c(0, 2500))
-  points(rep(2002,4), baltimore2002ByTypeSum, pch=c(1,2,3,4))
-  points(rep(2005,4), baltimore2005ByTypeSum, pch=c(1,2,3,4))
-  points(rep(2008,4), baltimore2008ByTypeSum, pch=c(1,2,3,4))
   
-  segments(rep(1999,4), baltimore1999ByTypeSum, 
-           rep(2002,4), baltimore2002ByTypeSum)
-  segments(rep(2002,4), baltimore2002ByTypeSum, 
-           rep(2005,4), baltimore2005ByTypeSum)
-  segments(rep(2005,4), baltimore2005ByTypeSum, 
-           rep(2008,4), baltimore2008ByTypeSum)
+  data1999<-data.frame(rep(1999,4), baltimore1999ByTypeSum)
+  data2002<-data.frame(rep(2002,4), baltimore2002ByTypeSum)
+  data2005<-data.frame(rep(2005,4), baltimore2005ByTypeSum)
+  data2008<-data.frame(rep(2008,4), baltimore2008ByTypeSum)
+  
+  colnames(data1999)<-c("Year", "Emissions")
+  colnames(data2002)<-c("Year", "Emissions")
+  colnames(data2005)<-c("Year", "Emissions")
+  colnames(data2008)<-c("Year", "Emissions")
+  
+  qplot(x=Year, y=Emissions, data=data1999, geom="point") +
+        coord_cartesian(xlim=c(1999,2008), ylim=c(0,2500)) +
+        geom_point(data=data2002) +
+        geom_point(data=data2005) +
+        geom_point(data=data2008)
+  ggsave("q3.png", dpi=72)
 }
 
 q4<-function() {
@@ -99,5 +109,58 @@ q4<-function() {
   
   emissionsYear<-c(1999, 2002, 2005, 2008)
   
+  png("q4.png")
   plot(emissionsYear, totalCoalEmissions)
+  dev.off()
+}
+
+q5<-function(upperLimit=350, yaxisName="Baltimore Vehical Emissions", callPng=TRUE) {
+  shortNameContainsVeh<-subset(SCC, grepl("Veh", Short.Name))
+  
+  baltimoreVeh1999<-subset(NEI, (fips=="24510") & (year==1999) & (SCC %in% shortNameContainsVeh$SCC))
+  baltimoreVeh2002<-subset(NEI, (fips=="24510") & (year==2002) & (SCC %in% shortNameContainsVeh$SCC))
+  baltimoreVeh2005<-subset(NEI, (fips=="24510") & (year==2005) & (SCC %in% shortNameContainsVeh$SCC))
+  baltimoreVeh2008<-subset(NEI, (fips=="24510") & (year==2008) & (SCC %in% shortNameContainsVeh$SCC))
+  
+  totalBaltimoreVehEmissions1999<-sum(baltimoreVeh1999$Emissions)
+  totalBaltimoreVehEmissions2002<-sum(baltimoreVeh2002$Emissions)
+  totalBaltimoreVehEmissions2005<-sum(baltimoreVeh2005$Emissions)
+  totalBaltimoreVehEmissions2008<-sum(baltimoreVeh2008$Emissions)
+  
+  totalBaltimoreVehEmissions<-c(totalBaltimoreVehEmissions1999, 
+                                totalBaltimoreVehEmissions2002, 
+                                totalBaltimoreVehEmissions2005, 
+                                totalBaltimoreVehEmissions2008)
+  
+  emissionsYear<-c(1999, 2002, 2005, 2008)
+  
+  if (callPng) {png("q5.png")}
+  plot(emissionsYear, totalBaltimoreVehEmissions, ylim=c(0,upperLimit), ylab=yaxisName)
+  if (callPng) {dev.off()}
+  }
+
+q6<-function() {
+  png("q6.png")
+  q5(upperLimit=5000, yaxisName="Vehical Emissions", callPng=FALSE)
+  shortNameContainsVeh<-subset(SCC, grepl("Veh", Short.Name))
+  
+  losAngelesVeh1999<-subset(NEI, (fips=="06037") & (year==1999) & (SCC %in% shortNameContainsVeh$SCC))
+  losAngelesVeh2002<-subset(NEI, (fips=="06037") & (year==2002) & (SCC %in% shortNameContainsVeh$SCC))
+  losAngelesVeh2005<-subset(NEI, (fips=="06037") & (year==2005) & (SCC %in% shortNameContainsVeh$SCC))
+  losAngelesVeh2008<-subset(NEI, (fips=="06037") & (year==2008) & (SCC %in% shortNameContainsVeh$SCC))
+  
+  totalLosAngelesVehEmissions1999<-sum(losAngelesVeh1999$Emissions)
+  totalLosAngelesVehEmissions2002<-sum(losAngelesVeh2002$Emissions)
+  totalLosAngelesVehEmissions2005<-sum(losAngelesVeh2005$Emissions)
+  totalLosAngelesVehEmissions2008<-sum(losAngelesVeh2008$Emissions)
+  
+  totalLosAngelesVehEmissions<-c(totalLosAngelesVehEmissions1999, 
+                                 totalLosAngelesVehEmissions2002, 
+                                 totalLosAngelesVehEmissions2005, 
+                                 totalLosAngelesVehEmissions2008)
+  
+  emissionsYear<-c(1999, 2002, 2005, 2008)
+  
+  points(emissionsYear, totalLosAngelesVehEmissions, pch=2)
+  dev.off()
 }
