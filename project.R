@@ -16,7 +16,7 @@ q1<-function()
   emissionsYear<-c(1999, 2002, 2005, 2008)
   
   png("q1.png")
-  plot(emissionsYear, totalEmissions)
+  plot(emissionsYear, totalEmissions, ylim=c(0,8000000))
   dev.off()
 }
 
@@ -35,11 +35,13 @@ q2<-function() {
                              totalEmissionsBaltimore2008)
   emissionsYear<-c(1999, 2002, 2005, 2008)
   png("q2.png")
-  plot(emissionsYear, totalEmissionsBaltimore)
+  plot(emissionsYear, totalEmissionsBaltimore, ylim=c(0,3500))
   dev.off()
 }
 
 q3<-function() {
+  typeFactors<-factor(c("NON-ROAD","NONPOINT","ON-ROAD","POINT"))
+  
   baltimore1999<-subset(NEI, NEI$year==1999 & NEI$fips=="24510")
   baltimore1999$type<-as.factor(baltimore1999$type)
   baltimore1999ByType<-split(baltimore1999, baltimore1999$type)
@@ -72,21 +74,25 @@ q3<-function() {
                             with(baltimore2008ByType$"ON-ROAD",  sum(Emissions)),
                             with(baltimore2008ByType$POINT,      sum(Emissions)))
   
-  data1999<-data.frame(rep(1999,4), baltimore1999ByTypeSum)
-  data2002<-data.frame(rep(2002,4), baltimore2002ByTypeSum)
-  data2005<-data.frame(rep(2005,4), baltimore2005ByTypeSum)
-  data2008<-data.frame(rep(2008,4), baltimore2008ByTypeSum)
+  data1999<-data.frame(typeFactors, rep(1999,4), baltimore1999ByTypeSum)
+  data2002<-data.frame(typeFactors, rep(2002,4), baltimore2002ByTypeSum)
+  data2005<-data.frame(typeFactors, rep(2005,4), baltimore2005ByTypeSum)
+  data2008<-data.frame(typeFactors, rep(2008,4), baltimore2008ByTypeSum)
   
-  colnames(data1999)<-c("Year", "Emissions")
-  colnames(data2002)<-c("Year", "Emissions")
-  colnames(data2005)<-c("Year", "Emissions")
-  colnames(data2008)<-c("Year", "Emissions")
+  colnames(data1999)<-c("Type", "Year", "Emissions")
+  colnames(data2002)<-c("Type", "Year", "Emissions")
+  colnames(data2005)<-c("Type", "Year", "Emissions")
+  colnames(data2008)<-c("Type", "Year", "Emissions")
   
-  qplot(x=Year, y=Emissions, data=data1999, geom="point") +
-        coord_cartesian(xlim=c(1999,2008), ylim=c(0,2500)) +
-        geom_point(data=data2002) +
-        geom_point(data=data2005) +
-        geom_point(data=data2008)
+  t<-qplot(x=Year, y=Emissions, data=data1999, geom="point", color=Type) +
+    coord_cartesian(xlim=c(1999,2008), ylim=c(0,2500)) +
+    geom_segment(aes(x=Year,y=Emissions,xend=data2002$Year,yend=data2002$Emissions)) +
+    geom_point(data=data2002) +
+    geom_segment(aes(x=data2002$Year,y=data2002$Emissions,xend=data2005$Year,yend=data2005$Emissions)) +
+    geom_point(data=data2005) +
+    geom_segment(aes(x=data2005$Year,y=data2005$Emissions,xend=data2008$Year,yend=data2008$Emissions)) +
+    geom_point(data=data2008)
+  
   ggsave("q3.png", dpi=72)
 }
 
@@ -162,5 +168,6 @@ q6<-function() {
   emissionsYear<-c(1999, 2002, 2005, 2008)
   
   points(emissionsYear, totalLosAngelesVehEmissions, pch=2)
+  legend(1999, y=3000, c("Baltimore","Los Angeles"), pch=c(1,2))
   dev.off()
 }
